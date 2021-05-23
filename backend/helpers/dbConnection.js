@@ -14,7 +14,7 @@ function connect() {
   // Database connection events
   // When successfully connected
   mongoose.connection.on('connected', () => {
-    console.log(`Mongoose default connection open`.brightCyan.underline.bold);
+    console.log(`Mongoose default connection open for worker ${process.pid}`.brightCyan.underline.bold);
   });
 
   // If the connection throws an error
@@ -24,15 +24,13 @@ function connect() {
 
   // When the connection is disconnected
   mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose default connection disconnected');
+    console.log(`Mongoose default connection disconnected for worker ${process.pid}`);
   });
 
   // If the Node process ends, close the Mongoose and Redis connection
   process.on('SIGINT', () => {
     mongoose.connection.close(() => {
-      console.log(
-        'Mongoose default connection disconnected through app termination'
-      );
+      console.log('Mongoose default connection disconnected through app termination');
       // eslint-disable-next-line no-process-exit
       process.exit();
     });
