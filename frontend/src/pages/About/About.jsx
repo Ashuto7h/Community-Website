@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import { MDBBadge } from "mdbreact";
 import teamData from "../../test_data/team-roles.json";
-
 import style from "./about.module.scss";
 import "./about.scss";
+import Loader from "../../components/util/Loader";
+import { SimpleToast } from "../../components/util/Toast/Toast";
+import { getTeamMembers } from "../../service/About";
 
 const useStyles = makeStyles(() => ({
   details: {
@@ -20,6 +22,30 @@ const useStyles = makeStyles(() => ({
 
 export const About = (props) => {
   let dark = props.theme;
+  const [team, setTeam] = useState([]);
+  const [image, setImage] = useState([]);
+  const [toast, setToast] = useState({
+    toastStatus: false,
+    toastType: "",
+    toastMessage: "",
+  });
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => {
+    getTeam();
+  }, []);
+  const getTeam = async () => {
+    setIsLoaded(true);
+      const {teamMembers, _image} = await getTeamMembers(setToast, toast);
+      setTeam(teamMembers);
+      setImage(_image);
+    setIsLoaded(false);
+  };
+  const handleCloseToast = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToast({ ...toast, toastStatus: false });
+  };
 
   const classes = useStyles();
   return (
@@ -98,80 +124,61 @@ export const About = (props) => {
           }
         ></div>
         <div className={style["row1"]}>
-          {Object.keys(teamData).map((role) => {
-            if (role !== "member") {
-              return teamData[role].map((roleObject) => {
-                return (
-                  <div
-                    className={
-                      dark
-                        ? `${style["card1"]} ${style["card1-dark"]}`
-                        : `${style["card1"]} ${style["card1-light"]}`
-                    }
-                  >
-                    <div className={style["photo"]}>
-                      <img
-                        alt="profile"
-                        className={style["cover"]}
-                        src={roleObject.profile_pic}
-                      />
-                      <div className={style["team-social"]}>
-                        <i
-                          href={roleObject.linkedin}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} +  fab fa-linkedin fa-2x in in-dark`
-                              : `${style["card-footer"]} +  fab fa-linkedin fa-2x in in-light`
-                          }
-                        ></i>
-                        <i
-                          href={roleObject.twitter}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-dark fa-2x`
-                              : `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-light fa-2x`
-                          }
-                        ></i>
-                        <i
-                          href={roleObject.github}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} fab fa-github-square fa-github-square-dark fa-2x`
-                              : `${style["card-footer"]} fab fa-github-square fa-github-square-light fa-2x`
-                          }
-                        ></i>
-                      </div>
-                    </div>
-                    <div className={classes.details}>
-                      <CardContent
-                        className={classes.content}
-                        id={style["content"]}
-                      >
-                        <Typography
-                          component="h6"
-                          variant="h6"
-                          id={style["Mui-h6"]}
-                        >
-                          {roleObject.name}
-                        </Typography>
-                        <MDBBadge
-                          pill
-                          className={style["info"] + ` ` + style["badge"]}
-                        >
-                          {role.toUpperCase()}
-                        </MDBBadge>
-                        <div>
-                          <p id={style["intro"]}>{roleObject.description}</p>
-                        </div>
-                        <br />
-                      </CardContent>
-                    </div>
-                  </div>
-                );
-              });
+          <div
+            className={
+              dark
+                ? `${style["card1"]} ${style["card1-dark"]}`
+                : `${style["card1"]} ${style["card1-light"]}`
             }
-            return null;
-          })}
+          >
+            <div className={style["photo"]}>
+              <img
+                alt="profile"
+                className={style["cover"]}
+                src={"./images/founder.jpeg"}
+              />
+              <div className={style["team-social"]}>
+                <i
+                  onClick={() => window.open("https://www.linkedin.com/in/kajol-kumari-73245b166/", "_blank")}
+                  className={
+                    dark
+                      ? `${style["card-footer"]} +  fab fa-linkedin fa-2x in in-dark`
+                      : `${style["card-footer"]} +  fab fa-linkedin fa-2x in in-light`
+                  }
+                ></i>
+                <i
+                  onClick={() => window.open("https://x.com/_Kajol_singh_", "_blank")}
+                  className={
+                    dark
+                      ? `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-dark fa-2x`
+                      : `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-light fa-2x`
+                  }
+                ></i>
+                <i
+                  onClick={()=>window.open("https://github.com/Kajol-Kumari", "_blank")}
+                  className={
+                    dark
+                      ? `${style["card-footer"]} fab fa-github-square fa-github-square-dark fa-2x`
+                      : `${style["card-footer"]} fab fa-github-square fa-github-square-light fa-2x`
+                  }
+                ></i>
+              </div>
+            </div>
+            <div className={classes.details}>
+              <CardContent className={classes.content} id={style["content"]}>
+                <Typography component="h6" variant="h6" id={style["Mui-h6"]}>
+                  {"Kajol Kumari"}
+                </Typography>
+                <MDBBadge pill className={style["info"] + ` ` + style["badge"]}>
+                  {"founder".toUpperCase()}
+                </MDBBadge>
+                <div>
+                  <p id={style["intro"]}>{"I am a Software Developer who ❤ contributing to open source"}</p>
+                </div>
+                <br />
+              </CardContent>
+            </div>
+          </div>
         </div>
 
         <Typography
@@ -188,119 +195,110 @@ export const About = (props) => {
           }
         ></div>
         <div className={style["row2"]}>
-          {Object.keys(teamData).map((role) => {
-            if (role === "member") {
-              return teamData[role].map((roleObject) => {
-                return (
-                  <div
-                    className={
-                      dark
-                        ? `${style["card1"]} ${style["card1-dark"]}`
-                        : `${style["card1"]} ${style["card1-light"]}`
+          {isLoaded?<Loader/> : team.map((roleObject, index) => {
+            return (
+              <div
+                key={index}
+                className={
+                  dark
+                    ? `${style["card1"]} ${style["card1-dark"]}`
+                    : `${style["card1"]} ${style["card1-light"]}`
+                }
+              >
+                <div className={style["photo"]}>
+                  <img
+                    alt="profile"
+                    className={style["cover"]}
+                    src={
+                      (image[index]?.id == roleObject?._id &&
+                        image[index]?.image) ||
+                      "./images/defaultUser.png"
                     }
-                  >
-                    <div className={style["photo"]}>
-                      <img
-                        alt="profile"
-                        className={style["cover"]}
-                        src={roleObject.profile_pic}
-                      />
-                      <div className={style["team-social"]}>
-                        <i
-                          href={roleObject.linkedin}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} fab fa-linkedin fa-2x in in-dark`
-                              : `${style["card-footer"]} fab fa-linkedin fa-2x in in-light`
-                          }
-                        ></i>
-                        <i
-                          href={roleObject.twitter}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-dark fa-2x`
-                              : `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-light fa-2x`
-                          }
-                        ></i>
-                        <i
-                          href={roleObject.github}
-                          className={
-                            dark
-                              ? `${style["card-footer"]} fab fa-github-square fa-github-square-dark fa-2x`
-                              : `${style["card-footer"]} fab fa-github-square fa-github-square-light fa-2x`
-                          }
-                        ></i>
-                      </div>
-                    </div>
-                    <div className={classes.details}>
-                      <CardContent
-                        className={classes.content}
-                        id={style["content"]}
-                      >
-                        <Typography
-                          component="h6"
-                          variant="h6"
-                          id={style["Mui-h6"]}
-                        >
-                          {roleObject.name}
-                        </Typography>
-                        <div>
-                          <p id={style["intro"]}>{roleObject.description}</p>
-                        </div>
-                        <div className={style["badge-container"]}>
-                          {roleObject.tags.map((badge) => {
-                            return (
-                              <MDBBadge
-                                className={
-                                  (badge === "Open Source" &&
-                                    style["primary"]) ||
-                                  (badge === "Social Media" &&
-                                    style["default"]) ||
-                                  (badge === "Broadcast" &&
-                                    style["broadcast"]) ||
-                                  (badge === "Core Team" && style["info"])
-                                }
-                              >
-                                {badge}
-                              </MDBBadge>
-                            );
-                          })}
-                        </div>
-                        <br />
-                      </CardContent>
-                    </div>
+                  />
+                  <div className={style["team-social"]}>
+                    <i
+                      href={roleObject.linkedin_url}
+                      onClick={() =>
+                        window.open(roleObject.linkedin_url, "_blank")
+                      }
+                      className={
+                        dark
+                          ? `${style["card-footer"]} fab fa-linkedin fa-2x in in-dark`
+                          : `${style["card-footer"]} fab fa-linkedin fa-2x in in-light`
+                      }
+                    ></i>
+                    <i
+                      href={roleObject.twitter_url}
+                      onClick={() =>
+                        window.open(roleObject.twitter_url, "_blank")
+                      }
+                      className={
+                        dark
+                          ? `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-dark fa-2x`
+                          : `${style["card-footer"]} fab fa-twitter-square fa-twitter-square-light fa-2x`
+                      }
+                    ></i>
+                    <i
+                      href={roleObject.github_url}
+                      onClick={() =>
+                        window.open(roleObject.github_url, "_blank")
+                      }
+                      className={
+                        dark
+                          ? `${style["card-footer"]} fab fa-github-square fa-github-square-dark fa-2x`
+                          : `${style["card-footer"]} fab fa-github-square fa-github-square-light fa-2x`
+                      }
+                    ></i>
                   </div>
-                );
-              });
-            }
-            return null;
+                </div>
+                <div className={classes.details}>
+                  <CardContent
+                    className={classes.content}
+                    id={style["content"]}
+                  >
+                    <Typography
+                      component="h6"
+                      variant="h6"
+                      id={style["Mui-h6"]}
+                    >
+                      {roleObject?.full_name}
+                    </Typography>
+                    <div>
+                      <p id={style["intro"]}>{roleObject?.description}</p>
+                    </div>
+                    <div className={style["badge-container"]}>
+                      {roleObject?.teams?.map((badge) => {
+                        return (
+                          <MDBBadge
+                            className={
+                              (badge === "open-source" && style["primary"]) ||
+                              (badge === "social" && style["default"]) ||
+                              (badge === "broadcast" && style["broadcast"]) ||
+                              (badge === "design" && style["info"]) ||
+                              (badge === "resource-sharing" && style["info"])
+                            }
+                          >
+                            {badge}
+                          </MDBBadge>
+                        );
+                      })}
+                    </div>
+                    <br />
+                  </CardContent>
+                </div>
+              </div>
+            );
           })}
         </div>
-        <Typography
-          variant="h4"
-          id={dark ? `${style["heading-dark"]}` : `${style["heading-light"]}`}
-        >
-          Open Source Contributors
-        </Typography>
-        <div
-          className={
-            dark
-              ? `${style["dash"]} ${style["dash-dark"]}`
-              : `${style["dash"]} ${style["dash-light"]}`
-          }
-        ></div>
-        <div className="container">
-          <div className={style["contributors"]}>
-            <a href="https://github.com/HITK-TECH-Community/Community-Website/graphs/contributors">
-              <img
-                style={{ maxWidth: "90vw" }}
-                src="https://contrib.rocks/image?repo=HITK-TECH-Community/Community-Website"
-                alt="contributors"
-              />
-            </a>
-          </div>
-        </div>
       </div>
+      {toast.toastStatus && (
+        <SimpleToast
+          open={toast.toastStatus}
+          message={toast.toastMessage}
+          handleCloseToast={handleCloseToast}
+          severity={toast.toastType}
+        />
+      )}
     </div>
   );
 };

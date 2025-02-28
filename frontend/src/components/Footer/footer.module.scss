@@ -188,8 +188,10 @@
 .fa-envelope,
 .fa-github,
 .fa-github-own,
-.fa-envelope-own,
+.fa-instagram-own,
 .fa-slack-own,
+.fa-twitter-own,
+.fa-youtube-own,
 .fa-linkedin-own {
   padding: 5px;
   color: white;
@@ -210,9 +212,24 @@
   color: #c71610;
 }
 
+.fa-instagram:hover,
+.fa-instagram-own:hover {
+  color: #f77737;
+}
+
 .fa-github:hover,
 .fa-github-own:hover {
   color: #7af7cd;
+}
+
+.fa-twitter:hover,
+.fa-twitter-own:hover {
+  color: #1da1f2;
+}
+
+.fa-youtube:hover,
+.fa-youtube-own:hover {
+  color: #ff0000;
 }
 
 .footer-dash {
@@ -570,6 +587,14 @@ a > span {
   color: #fff;
 }
 
+.input-field-footer::placeholder {
+  color: #555555;
+}
+
+.input-field-footer:focus::placeholder {
+  color: #999999;
+}
+
 .validation {
   color: red;
   margin-top: 0;
@@ -677,7 +702,7 @@ a > span {
   }
 }
 
-@media screen and (max-width: 510px) {
+@media screen and (max-width: 1124px) {
   .col .social {
     display: grid;
     grid-template-columns: 50% 50%;

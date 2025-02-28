@@ -1,35 +1,50 @@
 import React, { useState } from "react";
 import ReactCardFlip from "react-card-flip";
 import { Modals } from "../../Carousel/Modal/index.js";
-import { Delete, Edit } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
-import { useSelector } from "react-redux";
-
 import style from "./card.module.scss";
+import DOMPurify from "dompurify";
 
-function deleteCard(id) {
-  const cardElement = document.getElementById(id);
-  cardElement.classList.add("gonnaRemove");
-  setTimeout(() => cardElement.remove(), 1000);
-}
 export function Card(props) {
   let dark = props.theme;
   const [flipped, setFlipped] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState({});
+
   const handleClick = () => {
     setFlipped(!flipped);
   };
-  const [open, setOpen] = useState(false);
-  const [data, setData] = useState({});
-  const handleOpen = (s, h, i) => {
+
+  const handleOpen = (s, h, i, l) => {
     setOpen(true);
-    setData({ head: h, desc: s, img: i });
+    setData({ head: h, desc: s, img: i, link: l });
   };
 
   const handleClose = () => {
     setOpen(false);
     setData({});
   };
-  const isSuperAdmin = useSelector((state) => state.isSuperAdmin);
+
+  const date = new Date(props.project.createdAt.slice(0, 10));
+  var months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const sanitizedContent = DOMPurify.sanitize(props.project.content);
+  const truncatedContent =
+    sanitizedContent.length > 250
+      ? sanitizedContent.substring(0, 250) + "..."
+      : sanitizedContent;
 
   return (
     <div id={props.id} className={style["card-container"]}>
@@ -45,8 +60,12 @@ export function Card(props) {
         >
           <div className={style["clickable-card"]}>
             <div className={style["card-title"]}>{props.project.title}</div>
-            <div className={style["card-content"]}>
-              {props.project.content.substring(0, 400)}...
+            <div
+              className={style["card-content"]}
+              dangerouslySetInnerHTML={{ __html: truncatedContent }}
+            />
+            <div className={style["card-date"]}>
+              {months[date.getMonth()]},{date.getFullYear()}
             </div>
           </div>
         </div>
@@ -60,22 +79,6 @@ export function Card(props) {
           onClick={handleClick}
         >
           <div className={style["clickable-card"]}>
-            {isSuperAdmin ? (
-              <div className={style["admin-controls"]}>
-                <IconButton
-                  className={style["icon-button"]}
-                  onClick={props.handler}
-                >
-                  <Edit />
-                </IconButton>
-                <IconButton
-                  className={style["icon-button"]}
-                  onClick={() => deleteCard(props.id)}
-                >
-                  <Delete />
-                </IconButton>
-              </div>
-            ) : null}
             <div
               className={
                 dark
@@ -91,7 +94,8 @@ export function Card(props) {
                 handleOpen(
                   props.project.content,
                   props.project.title,
-                  props.project.imageUrl[0]
+                  props.project.imageUrl[0],
+                  props.project.link
                 )
               }
               className={

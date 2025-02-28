@@ -9,18 +9,24 @@ import { ManageTeams } from "./Components/MangeTeams";
 import { AddTeamMember } from "./Components/AddTeamMember";
 import { About } from "./Components/About";
 import { JoinUs } from "./Components/JoinUs";
-import { Resource } from "./Components/Resource";
 import { Faq } from "./Components/Faq";
 import { Setting } from "./Components/Setting";
 import { Invite } from "./Components/Setting/Invite";
 import { Manage } from "./Components/Setting/Manage";
 import { ResetPassword } from "./Components/Setting/ResetPassword/ResetPassword";
 import { AddBroadcasts } from "./Components/Broadcast/AddBroadcasts";
+import { ManageBroadcasts } from "./Components/Broadcast/ManageBroadcasts";
 import { AddFaq } from "./Components/Faq/AddFaq";
 import { logout } from "../../store/actions/auth";
 import decode from "jwt-decode";
-
+import axios from "axios";
+import { END_POINT } from "../../config/api";
 import { useDispatch } from "react-redux";
+import { ManageFaq } from "./Components/Faq/ManageFaq";
+import { QandA } from "./Components/Faq/Q&A/QandA";
+import { Testimonial } from "./Components/Testimonial";
+import { AddTestimonial } from "./Components/Testimonial/AddTestimonial";
+import { ManageTestimonial } from "./Components/Testimonial/ManageTestimonial";
 
 export const Admin = (props) => {
   const [tab, setTab] = useState(1);
@@ -28,7 +34,38 @@ export const Admin = (props) => {
   const toggleNav = () => setIsMenuOpen(!isMenuOpen);
   const closeMobileMenu = () => setIsMenuOpen(false);
   const dispatch = useDispatch();
-
+  const [update,setUpdate]=useState(true);
+  const [qId,setQId] = useState("")
+  const [adminData, setAdminData] = useState({});
+  const [image,setImage]=useState('./images/admin.png');
+  const FetchAdminData = async () => {
+    try {
+      const baseUrl = `${END_POINT}/admin/`;
+      const params = {
+        type: "self",
+        email: localStorage.getItem("email"),
+      };
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      };
+       
+      const response = await axios.get(baseUrl, { params, headers });
+      let formattedPath = response.data[0].image?.replace(/\\/g, "/");
+      if (formattedPath?.startsWith("uploads/")) {
+        formattedPath = formattedPath.replace("uploads/", "");
+        if (formattedPath && formattedPath !=="undefined") {
+          formattedPath = `${END_POINT}/${formattedPath}`;
+        }
+      }
+      if(formattedPath!=="undefined" && formattedPath){
+          setImage(formattedPath);
+        }
+      setAdminData(response.data[0]);
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
+  };
   useEffect(() => {
     const token = localStorage.getItem("token");
     try {
@@ -36,12 +73,14 @@ export const Admin = (props) => {
       if (Date.now() >= exp * 1000) {
         localStorage.setItem("expired", true);
         logout(dispatch); //Key expired
+      } else {
+        FetchAdminData();
       }
     } catch (err) {
       logout(dispatch);
     }
     return true;
-  }, [dispatch]);
+  }, [dispatch,update]);
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -49,11 +88,11 @@ export const Admin = (props) => {
         <div className={style["left"]}>
           <div className={style["welcome-section"]} onClick={() => setTab(0)}>
             <img
-              src="./images/admin.png"
+              src={image}
               className={style["img-admin"]}
               alt="admin_img"
             />
-            <h1 className={style["h1"]}>Welcome Admin!</h1>
+            <h1 className={style["h1"]}>Welcome {adminData.firstName}!</h1>
           </div>
           <ul
             className={
@@ -129,19 +168,6 @@ export const Admin = (props) => {
             <li onClick={closeMobileMenu}>
               <div
                 className={
-                  tab === 12
-                    ? style["features-icons"]
-                    : style["features-icons1"]
-                }
-                onClick={() => setTab(12)}
-              >
-                <i className="fas fa-book fa-fw fa-lg" aria-hidden="true"></i>
-                <div className={style["span"]}>Resources</div>
-              </div>
-            </li>
-            <li onClick={closeMobileMenu}>
-              <div
-                className={
                   tab === 5 ? style["features-icons"] : style["features-icons1"]
                 }
                 onClick={() => setTab(5)}
@@ -150,7 +176,21 @@ export const Admin = (props) => {
                   className="fas fa-question fa-fw fa-lg"
                   aria-hidden="true"
                 ></i>
-                <div className={style["span"]}>FAQs</div>
+                <div className={style["span"]}>FAQs and Q&As</div>
+              </div>
+            </li>
+            <li onClick={closeMobileMenu}>
+              <div
+                className={
+                  tab === 20 ? style["features-icons"] : style["features-icons1"]
+                }
+                onClick={() => setTab(20)}
+              >
+                <i
+                  className="fas fa-solid fa-comments fa-fw fa-lg"
+                  aria-hidden="true"
+                ></i>
+                <div className={style["span"]}>Testimonial</div>
               </div>
             </li>
             <li onClick={closeMobileMenu}>
@@ -185,7 +225,7 @@ export const Admin = (props) => {
         </div>
         <div className={style["right"]}>
           {tab === 0 ? (
-            <Profile />
+            <Profile adminData={{...adminData,image}} update={()=>{setUpdate(!update)}} />
           ) : tab === 1 ? (
             <Dashboard setTab={setTab} />
           ) : tab === 2 ? (
@@ -196,8 +236,6 @@ export const Admin = (props) => {
             <About setTab={setTab} />
           ) : tab === 11 ? (
             <JoinUs />
-          ) : tab === 12 ? (
-            <Resource />
           ) : tab === 5 ? (
             <Faq setTab={setTab} />
           ) : tab === 6 ? (
@@ -210,12 +248,24 @@ export const Admin = (props) => {
             <AddBroadcasts />
           ) : tab === 10 ? (
             <AddFaq />
+          ) : tab === 17 ? (
+            <ManageFaq />
           ) : tab === 13 ? (
             <ManageTeams />
           ) : tab === 14 ? (
             <AddTeamMember />
           ) : tab === 15 ? (
             <ResetPassword />
+          ) : tab === 16 ? (
+            <ManageBroadcasts />
+          ) : tab === 18 ? (
+            <QandA setQId={setQId} setTab={setTab} tab={tab} />
+          ) : tab === 20 ? (
+            <Testimonial setTab={setTab} />
+          ) : tab === 21 ? (
+            <AddTestimonial setTab={setTab} />
+          ) : tab === 22 ? (
+            <ManageTestimonial setTab={setTab} />
           ) : null}
         </div>
       </div>

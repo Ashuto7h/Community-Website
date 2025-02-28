@@ -33,6 +33,14 @@ const adminSchema = new Schema(
       trim: true,
       unique: true,
     },
+    image: {
+      type: String,
+      trim: true,
+    },
+    refreshToken:{
+      type:String,
+      trim:true
+    }
   },
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class LoaderFull extends Component {
+class Loader extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,7 +28,7 @@ class LoaderFull extends Component {
     return (
       <div
         className="d-flex align-items-center w-100"
-        style={{ height: "75vh" }}
+        style={{ height: this.props.height || "75vh" }}
       >
         <div className="text-center w-100">
           <div
@@ -66,4 +66,4 @@ class LoaderFull extends Component {
   }
 }
 
-export default LoaderFull;
+export default Loader;

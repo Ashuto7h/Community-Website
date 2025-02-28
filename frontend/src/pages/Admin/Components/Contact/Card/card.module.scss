@@ -1,0 +1,100 @@
+.card-item {
+  text-align: center;
+  font-size: 1.5rem;
+  border-radius: 1em;
+  height: auto;
+  width: 15em;
+  margin: 1em 1em 1em 1.5em;
+  display: inline-block;
+  background-position: left center;
+  transition: all 0.5s ease-in;
+  background-color: #016795;
+  box-shadow: 0.5em 0.5em 0.5em rgb(54, 53, 53);
+}
+
+.card-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.9rem;
+  font-weight: bold;
+  color: white;
+}
+
+.card-detail {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.card-info {
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+}
+
+.card-link {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.card-link:hover {
+  color: #fb8500;
+}
+
+.button-group {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.button-edit {
+  padding: 10px 30px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background-color: rgb(124, 124, 252);
+  margin: 5px;
+  color: #fff;
+  width: 100px;
+  font-size: medium;
+  font-weight: bold;
+  transition: background-color 200ms;
+}
+
+.button-edit:hover {
+  background-color: rgb(177, 177, 250);
+}
+
+.button-delete {
+  padding: 10px 30px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background-color: #fc0254;
+  margin: 5px;
+  color: #fff;
+  width: 100px;
+  font-size: medium;
+  font-weight: bold;
+  transition: background-color 200ms;
+}
+
+.button-delete:hover {
+  background-color: #fc3779;
+}
+
+@media (max-width: 441px) {
+  .card-item {
+    width: 70vw;
+    margin: 0.5em 1em 1em 1.5em;
+  }
+}

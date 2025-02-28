@@ -3,9 +3,18 @@ import { Button2 } from "../../components/util/Button/index";
 import Recaptcha from "react-recaptcha";
 import style from "./ContactUs.module.scss";
 import Joi from "joi-browser";
+import { SimpleToast } from "../../components/util/Toast/index";
+import Loader from "../../components/util/Loader";
+import { postContactUs } from "../../service/ContactUs";
 
 export const ContactUs = (props) => {
-  const [isverfied, verified] = useState(false);
+  const [isVerified, verified] = useState(false);
+  const [toast, setToast] = useState({
+    toastStatus: false,
+    toastType: "",
+    toastMessage: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const recaptchaLoaded = () => {
     console.log("Recaptcha loaded");
   };
@@ -25,11 +34,16 @@ export const ContactUs = (props) => {
   });
 
   const [formerrors, setFormErrors] = useState({});
-  const [submited, setSubmited] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const schema = {
     name: Joi.string().trim().required().min(3).label("Name"),
-    email: Joi.string().trim().email().required().label("Email"),
+    email: Joi.string()
+      .trim()
+      .email({ minDomainAtoms: 2 })
+      .regex(/@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/) // Updated regex for valid domains
+      .required()
+      .label("Email"),
     subject: Joi.string().trim().required().min(5).label("Subject"),
     message: Joi.string().trim().required().min(8).label("Message"),
   };
@@ -62,9 +76,10 @@ export const ContactUs = (props) => {
       setFormErrors(errors);
     }
     if (errors) {
-      setSubmited(false);
+      setSubmitted(false);
     } else {
-      setSubmited(true);
+      setSubmitted(true);
+      submitContactFormData(formData);
       setFormData("");
     }
   };
@@ -79,6 +94,17 @@ export const ContactUs = (props) => {
     data[input.name] = input.value;
     setFormData({ ...data, [input.name]: input.value });
     setFormErrors(errors);
+  };
+  const submitContactFormData = async (formData) => {
+    setIsLoading(true);
+    const data = await postContactUs(formData,setToast,toast);
+    setIsLoading(false);
+  };
+  const handleCloseContactToast = (event,reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToast({ ...toast, toastStatus: false });
   };
   return (
     <div
@@ -97,18 +123,39 @@ export const ContactUs = (props) => {
           />
         </div>
         <div className={`${style["contact-child"]} ${style["child2"]}`}>
-          {submited ? (
-            <React.Fragment>
-              <div className={style["goodbye-card"]}>
-                <h1 className={style["card-heading"]}>Hello There !</h1>
-                <div className={style["inside-card"]}>
-                  <p style={{ textAlign: "center" }}>
-                    We have heard you! 😄 <br />
-                    We will get back to you very soon if required!
-                  </p>
+          {submitted ? (
+            isLoading ? (
+              <React.Fragment>
+                <div className={style["goodbye-card"]}>
+                  <Loader height="25vh" />
                 </div>
-              </div>
-            </React.Fragment>
+              </React.Fragment>
+            ) : toast.toastStatus === "error" ? (
+              <React.Fragment>
+                <div className={style["goodbye-card"]}>
+                  <h1 className={style["card-heading"]}>OOPS !</h1>
+                  <div className={style["inside-card"]}>
+                    <p style={{ textAlign: "center" }}>
+                      Sorry for the inconvenience caused, our servers are
+                      currently facing some issues. 🔧 <br />
+                      Please try again later!
+                    </p>
+                  </div>
+                </div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div className={style["goodbye-card"]}>
+                  <h1 className={style["card-heading"]}>Hello There !</h1>
+                  <div className={style["inside-card"]}>
+                    <p style={{ textAlign: "center" }}>
+                      We have heard you! 😄 <br />
+                      We will get back to you very soon if required!
+                    </p>
+                  </div>
+                </div>
+              </React.Fragment>
+            )
           ) : (
             <React.Fragment>
               <div
@@ -255,6 +302,14 @@ export const ContactUs = (props) => {
           )}
         </div>
       </div>
+      {toast.toastStatus && (
+        <SimpleToast
+          open={toast.toastStatus}
+          message={toast.toastMessage}
+          handleCloseToast={handleCloseContactToast}
+          severity={toast.toastType}
+        />
+      )}
     </div>
   );
 };

@@ -6,6 +6,8 @@ import MultiSelect from "react-multi-select-component";
 import { Button2 } from "../../../../components/util/Button/index";
 import { Grid } from "@material-ui/core";
 import { SimpleToast } from "./../../../../components/util/Toast/Toast";
+import { END_POINT } from "../../../../config/api";
+import { postTeamMember } from "../../../../service/About";
 
 export function AddTeamMember() {
   const options = [
@@ -23,14 +25,17 @@ export function AddTeamMember() {
     twitter: "",
     github: "",
   });
-
+  const [toast, setToast] = useState({
+    toastStatus: false,
+    toastType: "",
+    toastMessage: "",
+  });
   const [formerrors, setFormErrors] = useState({});
   const [teamError, setTeamError] = useState();
   const [teams, setTeams] = useState([]);
+  const [selectTeam, setSelectTeam] = useState([]);
   const [picUrl, setPicUrl] = useState("./images/admin.png");
   const [pic, setPic] = useState();
-  const [openSuccess, setOpenSuccessToast] = React.useState(false);
-
   const schema = {
     fullName: Joi.string().required(),
     description: Joi.string().required(),
@@ -85,7 +90,7 @@ export function AddTeamMember() {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSuccessToast(false);
+    setToast({ ...toast, toastStatus: false });
   };
 
   const handleChange = (e) => {
@@ -101,9 +106,7 @@ export function AddTeamMember() {
     setFormErrors(errors);
   };
 
-  console.log("formerrors: ", formerrors);
-
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
     if (formdata["linkedin"] === "") {
@@ -131,7 +134,15 @@ export function AddTeamMember() {
       console.log(errors);
     } else {
       //Call the Server
-      console.log("Submitted");
+      const form = new Object();
+      form["fullName"] = formdata?.fullName;
+      form["description"] = formdata?.description;
+      form["linkedinUrl"] = formdata?.linkedin;
+      form["githubUrl"] = formdata.github;
+      form["twitterUrl"] = formdata.twitter;
+      form["teams"] = selectTeam;
+      form["image"] = pic;
+      await postTeamMember(form, setToast, toast);
       const temp = {
         fullName: "",
         description: "",
@@ -141,7 +152,7 @@ export function AddTeamMember() {
       };
       setFormData(temp);
       setTeams([]);
-      setOpenSuccessToast(true);
+      setPicUrl("./images/admin.png");
     }
     return pic;
   };
@@ -288,7 +299,13 @@ export function AddTeamMember() {
               <MultiSelect
                 options={options} // Options to display in the dropdown
                 value={teams} // Preselected value to persist in dropdown
-                onChange={setTeams} // Function will trigger on change event
+                onChange={(selectedOptions) => {
+                  const selectedValues = selectedOptions.map(
+                    (option) => option.value
+                  );
+                  setSelectTeam(selectedValues);
+                  setTeams(selectedOptions);
+                }}
                 labelledBy={"Teams"} // Property name to display in the dropdown options
                 className={styles["dropdown"]}
               />
@@ -310,12 +327,15 @@ export function AddTeamMember() {
           </div>
         </div>
       </div>
-      <SimpleToast
-        open={openSuccess}
-        message="New member added successfully"
-        handleCloseToast={handleCloseToast}
-        severity="success"
-      />
+
+      {toast.toastStatus && (
+        <SimpleToast
+          open={toast.toastStatus}
+          message={toast.toastMessage}
+          handleCloseToast={handleCloseToast}
+          severity={toast.toastType}
+        />
+      )}
     </div>
   );
 }

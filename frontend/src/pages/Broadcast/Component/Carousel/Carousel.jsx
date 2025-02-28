@@ -6,18 +6,25 @@ import style from "./carousel.module.scss";
 import styles from "../../../Home/components/Motive/motive.module.scss";
 import "./custom-owl-carousel-style.scss";
 import { Modals } from "./Modal/index.js";
-import { END_POINT } from "./../../../../config/api";
+import Loader from "../../../../components/util/Loader";
+import { boardcast } from "../../../../service/Broadcast.jsx";
+import { SimpleToast } from "../../../../components/util/Toast/Toast.jsx";
+import DOMPurify from "dompurify";
 
 export function Carousel(props) {
   const head = props.head;
   let dark = props.theme;
-
+  const [toast, setToast] = useState({
+    toastStatus: false,
+    toastType: "",
+    toastMessage: "",
+  })
   const [open, setOpen] = useState(false);
   const [dataa, setDataa] = useState([]);
-
-  const handleOpen = (s, h, i) => {
+  const [isLoaded, setLoaded] = useState(false);
+  const handleOpen = (s, h, i, l) => {
     setOpen(true);
-    setData({ head: h, desc: s, img: i });
+    setData({ head: h, desc: s, img: i, link: l });
   };
 
   const handleClose = () => {
@@ -56,9 +63,10 @@ export function Carousel(props) {
     const style = {
       height: "13em",
       backgroundSize: "cover",
+      backgroundPosition: "center",
       backgroundBlendMode: "screen",
-      clipPath: "polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%)",
-      backgroundImage: `linear-gradient(45deg,rgba(255, 0, 90, 1) 0%,rgba(10, 24, 61, 1) 90%),url(${item.link})`,
+      backgroundImage: `linear-gradient(45deg,rgba(255, 0, 90, 1) 0%,
+      rgba(10, 24, 61, 1) 90%), url(${item.imageUrl[0]})`,
     };
     return style;
   });
@@ -67,31 +75,42 @@ export function Carousel(props) {
     const style = {
       height: "13em",
       backgroundSize: "cover",
+      backgroundPosition: "center",
       backgroundBlendMode: "screen",
-      clipPath: "polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%)",
       backgroundImage: `linear-gradient(45deg, 
         #4e4376 0%, 
-        #2b5876 90%),url(${item.link})`,
+        #2b5876 90%),url(${item.imageUrl[0]})`,
     };
     return style;
   });
 
   useEffect(() => {
-    return fetch(`${END_POINT}/broadcast`, {
-      method: "GET",
-    })
-      .then((response) =>
-        response
-          .json()
-          .then((res) => {
-            setDataa(res);
-          })
-          .catch((error) => console.log(error))
-      )
-      .catch((err) => console.log(err));
+    getData();
   }, []);
+  const getData = async () => {
+    setLoaded(false);
+    const result = await boardcast(setToast,toast)
+    const approvedBroadcasts = result.filter(broadcast => broadcast.isApproved);
+    setDataa(approvedBroadcasts);
+    setLoaded(true);
+  }
+  const handleCloseToast = (event,reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToast({ ...toast, toastStatus: false });
+  };
 
-  return (
+  const truncatedContent = (content, maxLength) => {
+    if (content.length > maxLength) {
+      return content.substring(0, maxLength) + '...';
+    }
+    return content;
+  };
+
+  return !isLoaded ? (
+    <Loader />
+  ) : (
     <React.Fragment>
       <Modals theme={dark} open={open} handleClose={handleClose} data={data} />
       <div className={style["slider-div"]}>
@@ -128,20 +147,27 @@ export function Carousel(props) {
                   : `${style["slide-card-light"]} ${style["slide-card"]}`
               }
               onClick={() =>
-                handleOpen(item.content, item.title, item.imageUrl[0])
+                handleOpen(item.content, item.title, item.imageUrl[0], item?.link)
               }
             >
-              <div
+              <div 
                 style={dark ? cardImageArrayDark[i] : cardImageArrayLight[i]}
               ></div>
-
+              
               <h3 className={style["card-head"]}>{item.title}</h3>
-              <div className={style["card-text"]}>
-                {item.content.substring(0, 210)}...
-              </div>
+              <div className={style["card-text"]} 
+              dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(truncatedContent(item.content, 170)),}} />
             </div>
           ))}
         </OwlCarousel>
+        {toast.toastStatus && (
+        <SimpleToast
+          open={toast.toastStatus}
+          message={toast.toastMessage}
+          handleCloseToast={handleCloseToast}
+          severity={toast.toastType}
+        />
+      )}
       </div>
     </React.Fragment>
   );

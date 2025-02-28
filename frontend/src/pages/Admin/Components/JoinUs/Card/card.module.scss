@@ -1,0 +1,167 @@
+.card-item {
+  text-align: center;
+  font-size: 1.5rem;
+  border-radius: 1em;
+  height: auto;
+  width: 15em;
+  margin: 1em;
+  display: inline-block;
+  background-position: left center;
+  transition: all 0.5s ease-in;
+  background-color: #016795;
+  box-shadow: 0.5em 0.5em 0.5em rgb(54, 53, 53);
+}
+
+.card-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.9rem;
+  font-weight: bold;
+  color: white;
+}
+
+.card-detail {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.card-info {
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+}
+
+.card-link {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.card-link:hover {
+  color: #fb8500;
+}
+
+.button-group {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.button-edit {
+  padding: 10px 30px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background-color: rgb(124, 124, 252);
+  margin: 5px;
+  color: #fff;
+  width: 100px;
+  font-size: medium;
+  font-weight: bold;
+  transition: background-color 200ms;
+}
+
+.button-edit:hover {
+  background-color: rgb(177, 177, 250);
+}
+
+.button-delete {
+  padding: 10px 30px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background-color: #fc0254;
+  margin: 5px;
+  color: #fff;
+  width: 100px;
+  font-size: medium;
+  font-weight: bold;
+  transition: background-color 200ms;
+}
+
+.button-delete:hover {
+  background-color: #fc3779;
+}
+
+.dot-loader {
+  position: relative;
+  margin:15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #000000;
+  color: #000000;
+  animation: dotPulse 1s infinite linear; /* Added animation for main dot */
+  animation-delay: 0.25s;
+}
+
+.dot-loader::before,
+.dot-loader::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #000000;
+  color: #000000;
+}
+
+.dot-loader::before {
+  left: -15px;
+  box-shadow: 15px 0 0 -5px #000000;
+  animation: dotPulseBefore 1s infinite linear;
+  animation-delay: 0s;
+}
+
+.dot-loader::after {
+  left: 15px;
+  box-shadow: -15px 0 0 -5px #000000;
+  animation: dotPulseAfter 1s infinite linear;
+  animation-delay: 0.5s;
+}
+
+@keyframes dotPulseBefore {
+  0% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+  30% {
+    box-shadow: 0 0 0 2px #000000;
+  }
+  60%,
+  100% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+}
+@keyframes dotPulse {
+  0% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+  30% {
+    box-shadow: 0 0 0 2px #000000;
+  }
+  60%,
+  100% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+}
+@keyframes dotPulseAfter {
+  0% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+  30% {
+    box-shadow: 0 0 0 2px #000000;
+  }
+  60%,
+  100% {
+    box-shadow: 0 0 0 -5px #000000;
+  }
+}

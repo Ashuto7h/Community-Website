@@ -281,3 +281,18 @@
     color: black;
   }
 }
+
+.data-loader {
+  width: 100%;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+}
+.checkbox-container {
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+.checkbox-label {
+  margin-left: 8px !important;
+}

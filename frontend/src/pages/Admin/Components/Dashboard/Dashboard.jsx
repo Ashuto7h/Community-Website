@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import LiveHelpIcon from "@material-ui/icons/LiveHelp";
 import PermContactCalendarIcon from "@material-ui/icons/PermContactCalendar";
 import { SimpleToast } from "../../../../components/util/Toast";
+import Chat from "@material-ui/icons/Chat"
 
 export const Dashboard = (props) => {
   const [openLoginSuccess, setOpenLoginSuccessToast] = React.useState(false);
@@ -46,14 +47,14 @@ export const Dashboard = (props) => {
       tab: 11,
     },
     {
-      name: "Resources",
-      icon: <i className="fa fa-book fa-lg" aria-hidden="true"></i>,
-      tab: 12,
-    },
-    {
       name: "FAQ",
       icon: <LiveHelpIcon style={{ fontSize: 23 }} />,
       tab: 5,
+    },
+    {
+      name: "Testimonial",
+      icon: <Chat style={{ fontSize: 23 }} />,
+      tab: 20,
     },
   ];
 
@@ -70,7 +71,7 @@ export const Dashboard = (props) => {
             <div className={style["card-content"]}>
               <div className={style["head1"]}>
                 <span>{d.icon}</span>
-                <h4> {d.name} </h4>
+                <h4 className="headmd"> {d.name} </h4>
               </div>
               <div className={style["content"]}>
                 Get all your {d.name} related details here!

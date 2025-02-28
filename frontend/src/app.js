@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+  useLocation,
+} from "react-router-dom";
 import { SimpleToast } from "../src/components/util/Toast/index";
 import "semantic-ui-css/semantic.min.css";
 import "./app.css";
@@ -25,6 +31,7 @@ import { Setting } from "./pages/Admin/Components/Setting";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy/index";
 import { Resources } from "./pages/Resources/index";
 import { Faq } from "./pages/Faq";
+import Ques from "./pages/Q&A/Q&A.jsx";
 import { Broadcast } from "./pages/Broadcast/index";
 import { AllBroadcasts } from "./pages/Broadcast/Component/AllBroadcasts/index";
 import { GetInvolved } from "./pages/GetInvolved";
@@ -34,7 +41,7 @@ import { useSelector } from "react-redux";
 
 const App = () => {
   const isSuperAdmin = useSelector((state) => state.isSuperAdmin);
-
+  let pathname = useLocation();
   function getTheme() {
     return JSON.parse(localStorage.getItem("dark")) || false;
   }
@@ -53,115 +60,124 @@ const App = () => {
   }
 
   useEffect(() => {
-    console.log("Theme changed");
-  }, [theme, toast]);
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <Fragment>
       <div className="Container">
         <SimpleToast open={toast} message={"You have changed the theme"} />
-        <Router>
-          <Switch>
-            {isSuperAdmin ? (
+        <Switch>
+          {isSuperAdmin ? (
+            <Route
+              exact={true}
+              path="/admin"
+              render={() => <LoggedIn theme={theme} />}
+            />
+          ) : null}
+
+          {isSuperAdmin ? (
+            <Route
+              exact={true}
+              path="/dashboard"
+              render={() => <Admin theme={theme} />}
+            />
+          ) : (
+            <Route
+              exact={true}
+              path="/dashboard"
+              render={() => <Redirect to="/admin" />}
+            />
+          )}
+          <div>
+            <Navbar handleClick={toggleTheme} theme={theme} />
+            <Switch>
+              <Route
+                exact={true}
+                path="/"
+                render={() => <Home theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/about-us"
+                render={() => <About theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/Broadcasts"
+                render={() => <Broadcast theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/all-broadcasts"
+                render={() => <AllBroadcasts theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/resources"
+                render={() => <Resources theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/contact-us"
+                render={() => <ContactUs theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/faqs"
+                render={() => <Faq theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/Q&A"
+                render={() => <Ques theme={theme} />}
+              />
               <Route
                 exact={true}
                 path="/admin"
-                render={() => <LoggedIn theme={theme} />}
+                render={() => <Login theme={theme} />}
               />
-            ) : null}
-
-            {isSuperAdmin ? (
               <Route
                 exact={true}
-                path="/dashboard"
-                render={() => <Admin theme={theme} />}
+                path="/forgot-password"
+                render={() => <ForgotPassword theme={theme} />}
               />
-            ) : null}
-            <div>
-              <Navbar handleClick={toggleTheme} theme={theme} />
-              <Switch>
-                <Route
-                  exact={true}
-                  path="/"
-                  render={() => <Home theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/about-us"
-                  render={() => <About theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/Broadcasts"
-                  render={() => <Broadcast theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/all-broadcasts"
-                  render={() => <AllBroadcasts theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/resources"
-                  render={() => <Resources theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/contact-us"
-                  render={() => <ContactUs theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/faqs"
-                  render={() => <Faq theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/admin"
-                  render={() => <Login theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/forgot-password"
-                  render={() => <ForgotPassword theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/forgot-password/:id"
-                  component={ForgotPasswordRecovery}
-                />
-                <Route
-                  exact={true}
-                  path="/setting"
-                  render={() => <Setting theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/terms"
-                  render={() => <Terms theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/get-involved"
-                  render={() => <GetInvolved theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/privacy-policy"
-                  render={() => <PrivacyPolicy theme={theme} />}
-                />
-                <Route
-                  exact={true}
-                  path="/join-us-form"
-                  render={() => <JoinUsForm theme={theme} />}
-                />
-                <Route render={() => <NotFound theme={theme} />} />
-              </Switch>
-            </div>
-          </Switch>
-          <ScrollTop theme={theme}/>
-          <Footer className="Footer" theme={theme} />
-        </Router>
+              <Route
+                exact={true}
+                path="/forgot-password/:id"
+                component={ForgotPasswordRecovery}
+              />
+              <Route
+                exact={true}
+                path="/setting"
+                render={() => <Setting theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/terms"
+                render={() => <Terms theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/get-involved"
+                render={() => <GetInvolved theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/privacy-policy"
+                render={() => <PrivacyPolicy theme={theme} />}
+              />
+              <Route
+                exact={true}
+                path="/join-us-form"
+                render={() => <JoinUsForm theme={theme} />}
+              />
+              <Route render={() => <NotFound theme={theme} />} />
+            </Switch>
+          </div>
+        </Switch>
+        <ScrollTop theme={theme} />
+        <Footer className="Footer" theme={theme} />
       </div>
     </Fragment>
   );

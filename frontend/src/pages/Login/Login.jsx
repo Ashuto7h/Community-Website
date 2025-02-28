@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button2 } from "../../components/util/Button/index";
+import { Checkbox } from "@material-ui/core";
 import style from "./login.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions/actions";
@@ -7,6 +8,7 @@ import { END_POINT } from "../../config/api";
 import { SimpleToast } from "../../components/util/Toast";
 import { Link } from "react-router-dom";
 import Joi from "joi-browser";
+import Loader from "../../components/util/Loader";
 
 export function Login(props) {
   const [hidePassword, setHidePassword] = useState(false);
@@ -16,10 +18,11 @@ export function Login(props) {
   const dispatch = useDispatch();
   const dark = props.theme;
   const [errorObj, setErrorObj] = useState({});
-
+  const [isLoading, setIsLoading] = useState(false);
   const validationSchema = {
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    keepMeLoggedIn: Joi.boolean(),
   };
 
   const isFormValid = () => {
@@ -90,6 +93,7 @@ export function Login(props) {
 
   function loginUser(e) {
     e.preventDefault();
+    setIsLoading(true);
     if (isFormValid()) {
       return fetch(`${END_POINT}/auth/login`, {
         method: "POST",
@@ -103,8 +107,12 @@ export function Login(props) {
             .json()
             .then((res) => {
               if (response.status === 200) {
+                const firstName = res.name.split(" ")[0];
                 localStorage.setItem("token", res.token);
                 localStorage.setItem("isSuperAdmin", res.isSuperAdmin);
+                localStorage.setItem("firstName", firstName);
+                localStorage.setItem("email", res.email);
+                localStorage.setItem("phone", res.phone);
                 window.location = "/dashboard?loggedin";
               } else if (response.status === 400) {
                 setOpenError2Toast(true);
@@ -112,11 +120,17 @@ export function Login(props) {
                 setOpenError3Toast(true);
               }
             })
-            .catch((err) => setOpenError3Toast(true))
+            .catch((err) => {
+              console.error(err);
+              setOpenError3Toast(true);
+            })
         )
         .catch((err) => {
           setOpenError1Toast(true);
           console.error("must be a backend problem🤔:", err);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }
@@ -127,6 +141,9 @@ export function Login(props) {
 
   return (
     <>
+      <div className={style["data-loader"]}>
+        {isLoading ? <Loader /> : null}
+      </div>
       <div
         className={
           dark
@@ -221,6 +238,26 @@ export function Login(props) {
                         <div>&nbsp; &nbsp;</div>
                       )}
                     </div>
+                  </div>
+                  <div className={style["checkbox-container"]}>
+                    <input
+                      type="checkbox"
+                      name="keepMeLoggedIn"
+                      id="checkBox"
+                      value={credential?.keepMeLoggedIn}
+                      onChange={(e) => {
+                        setCredential({
+                          ...credential,
+                          keepMeLoggedIn: e.target.checked,
+                        });
+                      }}
+                    />
+                    <label
+                      className={style["checkbox-label"]}
+                      htmlFor="checkBox"
+                    >
+                      Keep Me Logged In
+                    </label>
                   </div>
                   <div className={style["submit-btn"]}>
                     <Button2

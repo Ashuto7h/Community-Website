@@ -11,7 +11,7 @@
 
 .card-item-light {
   background-color: #016795;
-  box-shadow: 1em 1em 1em rgb(54, 53, 53);
+  box-shadow: 0.5em 0.5em 0.5em rgb(54, 53, 53);
 }
 
 // for dark theme
@@ -56,6 +56,9 @@
   text-align: center;
   font-size: 1.2rem;
   width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: inline-block;
 }
 
 .card-item-light:hover {
@@ -144,4 +147,12 @@
 
 .icon-button span {
   color: white;
+}
+
+.card-date {
+  font-weight: normal;
+  text-align: center;
+  font-size: 1.2rem;
+  width: 100%;
+  margin-top: 1rem;
 }

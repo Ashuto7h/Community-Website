@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import style from "./footer.module.scss";
+import { postSubscriber } from '../../service/Subscriber'
+import { SimpleToast } from "../util/Toast";
 
 //react-icon
 import { FiCheckSquare } from "react-icons/fi";
@@ -12,6 +14,11 @@ export const Footer = (props) => {
   const [email, setEmail] = useState("");
   //setting email error
   const [emailErr, setEmailErr] = useState({});
+  const [toast, setToast] = useState({
+    toastStatus: false,
+    toastType: "",
+    toastMessage: "",
+  });
 
   const emailValidation = (email) => {
     let isValid = true;
@@ -47,14 +54,15 @@ export const Footer = (props) => {
   };
 
   //handling submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     //if isValid = true, form submission trigger
     const isValid = validation();
     if (isValid) {
-      setSubmited(true);
+      const res=await postSubscriber({email},setToast)
       //resetting email value in state after submission of form
-      setEmail("");
+      if(res)
+        setEmail("");
     }
   };
   var date = new Date();
@@ -79,93 +87,78 @@ export const Footer = (props) => {
             Technology, Chowbaga Road, Kolkata, West Bengal - 700107, India
             <br />
           </address>
-          {submited ? (
-            <React.Fragment>
-              <div
+          <a
+            href="mailto:hitktechcommunity@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "white" }}
+          >
+            <p>Email: hitktechcommunity@gmail.com</p>
+          </a>
+          <React.Fragment>
+            <div className={style["newsletter"]}>
+              <h2
                 className={
-                  dark
-                    ? `${style["subscribe-card"]} ${style["subscribe-card-dark"]}`
-                    : `${style["subscribe-card"]} `
+                  dark ? style["nav-title-dark"] : style["nav-title"]
                 }
               >
-                <h1
+                Sign Up for our Newsletter
+              </h2>
+              <p>
+                Receive updates and news about various Job Opportunities,
+                Internships, Webinars and Open Source Events.
+              </p>
+              <form
+                className="d-flex flex-column flex-md-row align-items-center mt-4"
+                onSubmit={handleSubmit}
+              >
+                <input
+                  autoComplete="off"
+                  type="text"
+                  name="email"
                   className={
                     dark
-                      ? `${style["card-heading"]} ${style["card-heading-dark"]}`
-                      : `${style["card-heading"]} `
+                      ? `${style["input-field-footer"]} ${style["input-field-footer-dark"]}`
+                      : `${style["input-field-footer"]}`
                   }
-                >
-                  successfully subscribed to our newsletter
-                  <FiCheckSquare className={style["newsletter-icon"]} />
-                </h1>
-              </div>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <div className={style["newsletter"]}>
-                <h2
-                  className={
-                    dark ? style["nav-title-dark"] : style["nav-title"]
-                  }
-                >
-                  Sign Up for our Newsletter
-                </h2>
-                <p>
-                  Receive updates and news about various Job Opportunities,
-                  Internships, Webinars and Open Source Events.
-                </p>
-                <form
-                  className="d-flex flex-column flex-md-row align-items-center mt-4"
-                  onSubmit={handleSubmit}
-                >
-                  <input
-                    autoComplete="off"
-                    type="text"
-                    name="email"
-                    className={
-                      dark
-                        ? `${style["input-field-footer"]} ${style["input-field-footer-dark"]}`
-                        : `${style["input-field-footer"]}`
-                    }
-                    placeholder="Email Id"
-                    onChange={handleEmailChange}
-                    value={email}
-                  />
-                  <br />
-                  {Object.keys(emailErr).map((key) => {
-                    return (
-                      <div
-                        className={`${style["validation"]} d-sm-block d-md-none`}
-                        key={key}
-                      >
-                        {emailErr[key]}
-                      </div>
-                    );
-                  })}
-                  <button
-                    type="submit"
-                    className={
-                      dark
-                        ? `mt-3 mt-md-0 ${style["submit-btn-footer"]} py-2 px-3 mt-3 mt-md-0 ${style["submit-btn-footer-dark"]} py-2 px-3 `
-                        : `mt-3 mt-md-0 ${style["submit-btn-footer"]} py-2 px-3 `
-                    }
-                  >
-                    Sign Up
-                  </button>
-                </form>
+                  placeholder="Email Id"
+                  onChange={handleEmailChange}
+                  value={email}
+                />
+                <br />
                 {Object.keys(emailErr).map((key) => {
                   return (
                     <div
-                      className={`${style["validation-new"]} validation-new d-sm-none d-md-block`}
+                      className={`${style["validation"]} d-sm-block d-md-none`}
                       key={key}
                     >
                       {emailErr[key]}
                     </div>
                   );
                 })}
-              </div>
-            </React.Fragment>
-          )}
+                <button
+                  type="submit"
+                  className={
+                    dark
+                      ? `mt-3 mt-md-0 ${style["submit-btn-footer"]} py-2 px-3 mt-3 mt-md-0 ${style["submit-btn-footer-dark"]} py-2 px-3 `
+                      : `mt-3 mt-md-0 ${style["submit-btn-footer"]} py-2 px-3 `
+                  }
+                >
+                  Sign Up
+                </button>
+              </form>
+              {Object.keys(emailErr).map((key) => {
+                return (
+                  <div
+                    className={`${style["validation-new"]} validation-new d-sm-none d-md-block`}
+                    key={key}
+                  >
+                    {emailErr[key]}
+                  </div>
+                );
+              })}
+            </div>
+          </React.Fragment>
         </div>
         <ul className={style["footer-nav"]}>
           <li className={style["nav-item"]}>
@@ -222,6 +215,7 @@ export const Footer = (props) => {
             <ul className={dark ? style["nav-ul-dark"] : style["nav-ul"]}>
               <li>Be sure to give us a follow on the below social links</li>
             </ul>
+
             <div className={`col ${style["col"]}`}>
               <ul className={dark ? style["social-dark"] : style["social"]}>
                 <li>
@@ -245,7 +239,7 @@ export const Footer = (props) => {
                 </li>
                 <li>
                   <a
-                    href="https://join.slack.com/t/hitkteckcommunity/shared_invite/zt-jgr1sd87-lhiXHO_x63Kt7h8VBxDaFw"
+                    href="https://hitkteckcommunity.slack.com/join/shared_invite/zt-njgae7ki-Xn1y4Nmc_bwqwU~tN52vrg"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -264,7 +258,7 @@ export const Footer = (props) => {
                 </li>
                 <li>
                   <a
-                    href="mailto:hitktechcommunity@gmail.com"
+                    href="https://www.instagram.com/hitktechcommunity"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -275,7 +269,7 @@ export const Footer = (props) => {
                       <span></span>
                       <div className={style["inner"]}>
                         <i
-                          className={`fas fa-envelope fa-lg ${style["fa-envelope-own"]}`}
+                          className={`fab fa-instagram fa-lg ${style["fa-instagram-own"]}`}
                         ></i>
                       </div>
                     </div>
@@ -295,6 +289,44 @@ export const Footer = (props) => {
                       <div className={style["inner"]}>
                         <i
                           className={`fab fa-github fa-lg ${style["fa-github-own"]}`}
+                        ></i>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://twitter.com/HitkTech"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className={style["outer"]}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <div className={style["inner"]}>
+                        <i
+                          className={`fab fa-twitter fa-lg ${style["fa-twitter-own"]}`}
+                        ></i>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.youtube.com/channel/UCaMU1D4pJALSHLo6OsiDzGg"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className={style["outer"]}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <div className={style["inner"]}>
+                        <i
+                          className={`fab fa-youtube fa-lg ${style["fa-youtube-own"]}`}
                         ></i>
                       </div>
                     </div>
@@ -337,6 +369,14 @@ export const Footer = (props) => {
         <p className={`${style["cprt"]} py-2`}>
           Copyright © {year} HITK Tech Community
         </p>
+        {toast.toastStatus && (
+          <SimpleToast
+            open={toast.toastStatus}
+            message={toast.toastMessage}
+            handleCloseToast={() => { setToast({ toastStatus: false, toastMessage: "", toastType: "" }) }}
+            severity={toast.toastType}
+          />
+        )}
       </div>
     </React.Fragment>
   );

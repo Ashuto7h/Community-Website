@@ -1,6 +1,6 @@
 container {
   width: 90%;
-  display : flex;
+  display: flex;
   justify-content: space-between;
   margin-bottom: 2em;
 }
@@ -26,7 +26,9 @@ container {
 
 .img-admin {
   width: 50%;
+  aspect-ratio: 1 / 1;
   margin: 1em;
+  border-radius: 50%;
 }
 
 .h1 {
@@ -61,7 +63,7 @@ container {
   width: 75%;
   margin: 2em 0em 0em 2em;
   background-color: white;
-  padding: 1em;
+  padding: 0.5em;
   border-radius: 12px;
   box-shadow: 0px 8px 10px 3px gray;
   transition: all 0.3s;
@@ -97,6 +99,10 @@ container {
   color: black;
   display: flex;
   align-items: center;
+  transition: 0.3s;
+}
+.features-icons1:hover {
+  background-color: rgb(240, 240, 240);
 }
 
 .menu-icon {
@@ -106,6 +112,8 @@ container {
 .left > ul {
   padding-left: 0;
 }
+
+
 
 @media (max-width: 600px) {
   .dashing {
